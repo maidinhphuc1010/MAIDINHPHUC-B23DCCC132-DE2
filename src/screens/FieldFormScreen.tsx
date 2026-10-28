@@ -1,15 +1,18 @@
 import React from 'react';
 import { Alert, StyleSheet } from 'react-native';
-import type { Field, FieldFormData } from '../types';
+import type { FieldFormData } from '../types';
 import { useFields } from '../hooks/useFields';
 import { spacing } from '../theme';
 import { AppScreen, AppText } from '../components/common';
 import { FieldForm } from '../components/fields';
 
-interface Props { field?: Field; onBack: () => void; }
+interface Props { fieldId?: string; onBack: () => void; }
 
-export default function FieldFormScreen({ field, onBack }: Props) {
-  const { fields, addField, updateField } = useFields();
+export default function FieldFormScreen({ fieldId, onBack }: Props) {
+  const { fields, loading, addField, updateField } = useFields();
+  const field = fields.find(candidate => candidate.id === fieldId);
+  if (loading) return <AppScreen><AppText variant="body">Đang tải dữ liệu sân…</AppText></AppScreen>;
+  if (fieldId && !field) return <AppScreen><AppText variant="title">Không tìm thấy sân</AppText></AppScreen>;
   const submit = async (data: FieldFormData) => {
     try {
       if (field) await updateField(field.id, data);

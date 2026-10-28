@@ -1,33 +1,48 @@
-import React, { useState } from 'react';
-import { useFields } from '../hooks/useFields';
-import { BackHandler } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator, type NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { Field } from '../types';
 import FieldDetailScreen from '../screens/FieldDetailScreen';
 import FieldFormScreen from '../screens/FieldFormScreen';
 import FieldListScreen from '../screens/FieldListScreen';
 
-type Screen = { name: 'list' } | { name: 'form'; field?: Field } | { name: 'detail'; fieldId: string };
+export type RootStackParamList = {
+  FieldList: undefined;
+  FieldForm: { fieldId?: string } | undefined;
+  FieldDetail: { fieldId: string };
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+type ListProps = NativeStackScreenProps<RootStackParamList, 'FieldList'>;
+type FormProps = NativeStackScreenProps<RootStackParamList, 'FieldForm'>;
+type DetailProps = NativeStackScreenProps<RootStackParamList, 'FieldDetail'>;
 
 export default function AppNavigator() {
-  const [screen, setScreen] = useState<Screen>({ name: 'list' });
-  const back = () => setScreen({ name: 'list' });
-  React.useEffect(() => {
-    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (screen.name === 'list') return false;
-      back();
-      return true;
-    });
-    return () => subscription.remove();
-  }, [screen]);
-
-  if (screen.name === 'form') return <FieldFormScreen field={screen.field} onBack={back} />;
-  if (screen.name === 'detail') {
-    return <DetailById fieldId={screen.fieldId} onBack={back} />;
-  }
-  return <FieldListScreen onAdd={() => setScreen({ name: 'form' })} onEdit={field => setScreen({ name: 'form', field })} onOpen={field => setScreen({ name: 'detail', fieldId: field.id })} />;
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="FieldList" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="FieldList" component={FieldListRoute} />
+        <Stack.Screen name="FieldForm" component={FieldFormRoute} />
+        <Stack.Screen name="FieldDetail" component={FieldDetailRoute} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 }
 
-function DetailById({ fieldId, onBack }: { fieldId: string; onBack: () => void }) {
-  const { getFieldById } = useFields();
-  return <FieldDetailScreen field={getFieldById(fieldId)} onBack={onBack} />;
+function FieldListRoute({ navigation }: ListProps) {
+  return (
+    <FieldListScreen
+      onAdd={() => navigation.navigate('FieldForm')}
+      onEdit={(field: Field) => navigation.navigate('FieldForm', { fieldId: field.id })}
+      onOpen={(field: Field) => navigation.navigate('FieldDetail', { fieldId: field.id })}
+    />
+  );
+}
+
+function FieldFormRoute({ navigation, route }: FormProps) {
+  return <FieldFormScreen fieldId={route.params?.fieldId} onBack={() => navigation.goBack()} />;
+}
+
+function FieldDetailRoute({ navigation, route }: DetailProps) {
+  return <FieldDetailScreen fieldId={route.params.fieldId} onBack={() => navigation.goBack()} />;
 }

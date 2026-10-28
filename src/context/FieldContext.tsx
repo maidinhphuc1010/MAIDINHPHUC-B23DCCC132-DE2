@@ -9,6 +9,7 @@ export interface FieldStoreValue {
   bookings: Booking[];
   loading: boolean;
   error: string | null;
+  retryInitialization: () => Promise<void>;
   addField: (field: FieldFormData) => Promise<Field>;
   updateField: (id: string, changes: Partial<FieldFormData>) => Promise<Field>;
   deleteField: (id: string) => Promise<void>;
@@ -25,9 +26,17 @@ export function FieldProvider({ children }: { children: React.ReactNode }) {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const dataRef = useRef({ fields, bookings });
   const readyRef = useRef(false);
   const writeQueueRef = useRef<Promise<void>>(Promise.resolve());
+
+  const retryInitialization = useCallback(async () => {
+    readyRef.current = false;
+    setLoading(true);
+    setError(null);
+    setLoadAttempt(attempt => attempt + 1);
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -44,10 +53,7 @@ export function FieldProvider({ children }: { children: React.ReactNode }) {
       } catch (cause) {
         if (mounted) {
           setError(cause instanceof Error ? cause.message : 'Không thể tải dữ liệu.');
-          dataRef.current = { fields: [], bookings: [] };
-          setFields([]);
-          setBookings([]);
-          readyRef.current = true;
+          readyRef.current = false;
         }
       } finally {
         if (mounted) setLoading(false);
@@ -55,7 +61,7 @@ export function FieldProvider({ children }: { children: React.ReactNode }) {
     };
     load();
     return () => { mounted = false; };
-  }, []);
+  }, [loadAttempt]);
 
   const commit = useCallback((next: { fields: Field[]; bookings: Booking[] }): Promise<void> => {
     dataRef.current = next;
@@ -116,9 +122,9 @@ export function FieldProvider({ children }: { children: React.ReactNode }) {
   const getBookingsByFieldId = useCallback((fieldId: string) => bookingService.getBookingsByFieldId(bookings, fieldId), [bookings]);
 
   const value = useMemo<FieldStoreValue>(() => ({
-    fields, bookings, loading, error, addField, updateField, deleteField,
+    fields, bookings, loading, error, retryInitialization, addField, updateField, deleteField,
     getFieldById, addBooking, cancelBooking, getBookingsByFieldId,
-  }), [fields, bookings, loading, error, addField, updateField, deleteField, getFieldById, addBooking, cancelBooking, getBookingsByFieldId]);
+  }), [fields, bookings, loading, error, retryInitialization, addField, updateField, deleteField, getFieldById, addBooking, cancelBooking, getBookingsByFieldId]);
 
   return <FieldContext.Provider value={value}>{children}</FieldContext.Provider>;
 }

@@ -6,6 +6,7 @@ export interface BookingContextValue {
   bookings: Booking[];
   loading: boolean;
   error: string | null;
+  retryInitialization: () => Promise<void>;
   addBooking: FieldStoreValue['addBooking'];
   cancelBooking: FieldStoreValue['cancelBooking'];
   getBookingsByFieldId: FieldStoreValue['getBookingsByFieldId'];
@@ -21,10 +22,11 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
     bookings: fieldStore.bookings,
     loading: fieldStore.loading,
     error: fieldStore.error,
+    retryInitialization: fieldStore.retryInitialization,
     addBooking: fieldStore.addBooking,
     cancelBooking: fieldStore.cancelBooking,
     getBookingsByFieldId: fieldStore.getBookingsByFieldId,
-  }), [fieldStore.bookings, fieldStore.loading, fieldStore.error, fieldStore.addBooking, fieldStore.cancelBooking, fieldStore.getBookingsByFieldId]);
+  }), [fieldStore.bookings, fieldStore.loading, fieldStore.error, fieldStore.retryInitialization, fieldStore.addBooking, fieldStore.cancelBooking, fieldStore.getBookingsByFieldId]);
 
   return <BookingContext.Provider value={value}>{children}</BookingContext.Provider>;
 }

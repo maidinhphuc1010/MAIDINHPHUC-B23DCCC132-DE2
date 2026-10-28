@@ -3,7 +3,7 @@ import { StyleSheet, TextInput, View, type KeyboardTypeOptions, type StyleProp, 
 import { colors, borderRadius, spacing, typography } from '../../theme';
 import AppText from './AppText';
 
-export interface AppInputProps extends Omit<TextInputProps, 'value' | 'onChangeText' | 'style'> {
+export interface AppInputProps extends Omit<TextInputProps, 'value' | 'onChangeText'> {
   label?: string;
   placeholder?: string;
   value: string;

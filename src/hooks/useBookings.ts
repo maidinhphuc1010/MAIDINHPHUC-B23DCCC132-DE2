@@ -8,6 +8,7 @@ export function useBookings() {
     bookings: context.bookings,
     loading: context.loading,
     error: context.error,
+    retryInitialization: context.retryInitialization,
     addBooking: context.addBooking,
     cancelBooking: context.cancelBooking,
     getBookingsByFieldId: context.getBookingsByFieldId,

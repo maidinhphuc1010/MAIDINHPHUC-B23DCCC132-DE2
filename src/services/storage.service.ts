@@ -71,10 +71,13 @@ export async function loadData(): Promise<LoadDataResult> {
   if (snapshotRaw !== null) {
     const snapshot = parseSnapshot(snapshotRaw);
     if (snapshot) return { ...snapshot, initialized: true, recovered: false };
-    // A damaged snapshot is never treated as a first launch: recover valid legacy data or start empty.
+    // A damaged snapshot is never treated as first launch; recover legacy data or safely reseed missing data.
     const fields = parseLegacyArray(fieldsRaw, isField);
     const bookings = parseLegacyArray(bookingsRaw, isBooking);
-    const recoveredData = { fields: fields ?? [], bookings: bookings ?? [] };
+    const recoveredData = {
+      fields: fields ?? [...MOCK_FIELDS],
+      bookings: bookings ?? [...MOCK_BOOKINGS],
+    };
     await saveData(recoveredData);
     return { ...recoveredData, initialized: true, recovered: true };
   }
@@ -85,8 +88,8 @@ export async function loadData(): Promise<LoadDataResult> {
 
   if (initialized) {
     const migrated = {
-      fields: legacyFields ?? [],
-      bookings: legacyBookings ?? [],
+      fields: legacyFields ?? [...MOCK_FIELDS],
+      bookings: legacyBookings ?? [...MOCK_BOOKINGS],
     };
     await saveData(migrated);
     return { ...migrated, initialized: true, recovered: legacyFields === undefined || legacyBookings === undefined };

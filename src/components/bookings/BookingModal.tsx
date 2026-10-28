@@ -38,6 +38,7 @@ function BookingModal({ visible, fieldId, pricePerHour, onClose, onSubmit, loadi
       setValues({ ...defaultValues, ...initialValues });
       setErrors({});
       setSubmitError(null);
+      setSubmitting(false);
     }
   }, [visible, initialValues]);
 

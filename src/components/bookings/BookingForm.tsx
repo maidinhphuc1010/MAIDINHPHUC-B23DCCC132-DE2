@@ -31,7 +31,7 @@ function BookingForm({ values, errors, onChange, onSubmit, disabled = false, sho
       <AppInput label="Tên khách" placeholder="Nhập tên khách" value={values.customerName} onChangeText={value => onChange('customerName', value)} error={errors.customerName} returnKeyType="next" />
       <AppInput label="Số điện thoại" placeholder="Nhập số điện thoại" value={values.phone} onChangeText={value => onChange('phone', value)} keyboardType="phone-pad" error={errors.phone} returnKeyType="next" />
       <AppInput label="Ngày đặt" placeholder="dd/mm/yyyy" value={values.date} onChangeText={value => onChange('date', value)} error={errors.date} />
-      <AppInput label="Giờ bắt đầu (0–23)" placeholder="Ví dụ: 18" value={values.startHour} onChangeText={value => onChange('startHour', value)} keyboardType="number-pad" error={errors.startHour} />
+      <AppInput label="Giờ bắt đầu (6–22)" placeholder="Ví dụ: 18" value={values.startHour} onChangeText={value => onChange('startHour', value)} keyboardType="number-pad" error={errors.startHour} />
       <View>
         <AppText variant="body" style={styles.hoursLabel}>Số giờ thuê</AppText>
         <View style={styles.hoursOptions}>

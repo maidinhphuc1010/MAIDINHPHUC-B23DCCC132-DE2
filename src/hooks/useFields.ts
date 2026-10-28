@@ -9,6 +9,7 @@ export function useFields() {
     activeCount: context.fields.filter(field => field.status === 'Hoạt động').length,
     loading: context.loading,
     error: context.error,
+    retryInitialization: context.retryInitialization,
     addField: context.addField,
     updateField: context.updateField,
     deleteField: context.deleteField,

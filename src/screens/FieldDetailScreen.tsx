@@ -1,18 +1,22 @@
 import React from 'react';
 import { Alert, FlatList, StyleSheet, View } from 'react-native';
-import type { Booking, Field } from '../types';
+import type { Booking } from '../types';
 import { useBookings } from '../hooks/useBookings';
+import { useFields } from '../hooks/useFields';
 import { colors, spacing } from '../theme';
 import { AppButton, AppCard, AppScreen, AppText, EmptyState, Loading } from '../components/common';
 import { BookingCard, BookingModal } from '../components/bookings';
 import { FieldStatusBadge } from '../components/fields';
 import { formatPricePerHour } from '../utils/formatters';
 
-interface Props { field: Field | undefined; onBack: () => void; }
+interface Props { fieldId: string; onBack: () => void; }
 
-export default function FieldDetailScreen({ field, onBack }: Props) {
+export default function FieldDetailScreen({ fieldId, onBack }: Props) {
+  const { fields } = useFields();
   const { loading, error, addBooking, cancelBooking, getBookingsByFieldId } = useBookings();
   const [modalVisible, setModalVisible] = React.useState(false);
+  const field = fields.find(candidate => candidate.id === fieldId);
+  if (loading) return <AppScreen><Loading message="Đang tải thông tin sân…" /></AppScreen>;
   if (!field) {
     return <AppScreen><AppText variant="title">Không tìm thấy sân</AppText><AppButton title="Quay lại" onPress={onBack} /></AppScreen>;
   }

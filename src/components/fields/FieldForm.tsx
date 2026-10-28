@@ -59,6 +59,8 @@ function FieldForm({ initialValues, fields = [], mode = initialValues ? 'edit' :
     setSubmitting(true);
     try {
       await onSubmit(data);
+    } catch {
+      // The owning screen reports submission errors to the user.
     } finally {
       setSubmitting(false);
     }
