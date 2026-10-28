@@ -38,7 +38,7 @@ function AppBootstrap() {
       <AppScreen>
         <AppText variant="title">Không thể khởi tạo ứng dụng</AppText>
         <AppText accessibilityRole="alert" color={colors.error}>{error}</AppText>
-        <AppButton title="Thử lại" onPress={() => { void retryInitialization(); }} />
+        <AppButton title="Thử lại" onPress={retryInitialization} />
       </AppScreen>
     );
   }
